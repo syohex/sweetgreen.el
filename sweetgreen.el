@@ -127,7 +127,7 @@
                    :sync t
                    :parser 'buffer-string
                    :error
-                   (cl-function (lambda (&key data error-thrown &allow-other-keys&rest _)
+                   (cl-function (lambda (&rest unused &key _data error-thrown &allow-other-keys)
                                   (error "Got error: %S" error-thrown)))
                    ))
         (data  (request-response-data response))
@@ -148,7 +148,7 @@
                                ("Content-Type" . "application/x-www-form-urlencoded"))
                     :parser 'json-read
                     :error
-                    (cl-function (lambda (&key data error-thrown &allow-other-keys&rest _)
+                    (cl-function (lambda (&rest unused &key _data error-thrown &allow-other-keys)
                                    (error "Got error: %S" error-thrown)))
                     ))
          (header (request-response-header response "set-cookie"))
@@ -218,7 +218,7 @@
    :sources (sweetgreen//make-helm-menu-sources restaurant_id)
    :buffer "*Sweetgreen ❤ Menu List*"))
 
-(defun sweetgreen//make-helm-menu-sources (restaurant_id)
+(defun sweetgreen//make-helm-menu-sources (_restaurant_id)
   "Sources for SWEETGREEN/HELM-MENU"
   (-map (lambda (menu)
           (let* ((name (upcase-initials (car menu)))
@@ -317,7 +317,7 @@
 
                      :parser 'json-read
                      :error
-                     (cl-function (lambda (&key data error-thrown &allow-other-keys&rest _)
+                     (cl-function (lambda (&rest unused &key _data error-thrown &allow-other-keys)
                                     (error "Got error: %S" error-thrown)))))
          (data       (request-response-data response))
          (order      (aref (=> data 'orders) 0)))
@@ -435,11 +435,9 @@ Confirm your order? "
      :data (json-encode data)
      :parser 'json-read
      :complete (cl-function
-                (lambda (&key data response &allow-other-keys)
-                  (let* ((basket     (aref (=> data 'orders) 0))
-                         (basket_id (=> basket 'basket_id)))
-                    (print data)
-                    (message "Yeah salad is ordered")))))))
+                (lambda (&key data _response &allow-other-keys)
+                  (print data)
+                  (message "Yeah salad is ordered"))))))
 
 ;;;###autoload
 (defun sweetgreen (args)
